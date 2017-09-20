@@ -1,4 +1,4 @@
-package com.codepath.tiago.nytimessearch;
+package com.codepath.tiago.nytimessearch.adapters;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -11,6 +11,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.codepath.tiago.nytimessearch.R;
+import com.codepath.tiago.nytimessearch.models.Article;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -36,6 +38,7 @@ public class ArticleArrayAdapter extends ArrayAdapter<Article> {
             convertView = inflater.inflate(R.layout.item_article_result, parent, false);
 
             ImageView ivImage = (ImageView) convertView.findViewById(R.id.ivImage);
+
             // Clear out recycled image from convertView from last time.
             ivImage.setImageResource(0);
 

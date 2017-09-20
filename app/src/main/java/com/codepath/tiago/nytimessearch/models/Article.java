@@ -1,4 +1,4 @@
-package com.codepath.tiago.nytimessearch;
+package com.codepath.tiago.nytimessearch.models;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -14,36 +14,35 @@ import java.util.List;
 
 public class Article implements Serializable {
 
-    String webUrl;
-    String headline;
+    String mWebUrl;
+    String mHeadline;
+    String mThumbnail;
 
     public String getWebUrl() {
-        return webUrl;
+        return mWebUrl;
     }
 
     public String getHeadline() {
-        return headline;
+        return mHeadline;
     }
 
     public String getThumbnail() {
-        return String.format("http://www.nytimes.com/%s", thumbnail);
+        return String.format("http://www.nytimes.com/%s", mThumbnail);
     }
-
-    String thumbnail;
 
     public Article(JSONObject jsonObject) {
         try {
 
-            this.webUrl = jsonObject.getString("web_url");
-            this.headline = jsonObject.getJSONObject("headline").getString("main");
+            this.mWebUrl = jsonObject.getString("web_url");
+            this.mHeadline = jsonObject.getJSONObject("headline").getString("main");
 
             JSONArray multimedia = jsonObject.getJSONArray("multimedia");
 
             if (multimedia.length() > 0) {
                 JSONObject multimediaJson = multimedia.getJSONObject(0);
-                this.thumbnail = multimediaJson.getString("url");
+                this.mThumbnail = multimediaJson.getString("url");
             } else {
-                this.thumbnail = "";
+                this.mThumbnail = "";
             }
 
         } catch(JSONException e) {

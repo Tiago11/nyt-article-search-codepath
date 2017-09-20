@@ -12,9 +12,10 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.Toast;
 
-import com.codepath.tiago.nytimessearch.Article;
-import com.codepath.tiago.nytimessearch.ArticleArrayAdapter;
+import com.codepath.tiago.nytimessearch.models.Article;
+import com.codepath.tiago.nytimessearch.adapters.ArticleArrayAdapter;
 import com.codepath.tiago.nytimessearch.R;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -35,8 +36,8 @@ public class SearchActivity extends AppCompatActivity {
     GridView gvResults;
     Button btnSearch;
 
-    List<Article> articles;
-    ArticleArrayAdapter adapter;
+    List<Article> mArticles;
+    ArticleArrayAdapter mAdapter;
 
     String NYT_API_KEY = "8337eda794df48cbb6ae2fd466c77561";
 
@@ -55,9 +56,9 @@ public class SearchActivity extends AppCompatActivity {
         gvResults = (GridView) findViewById(R.id.gvResults);
         btnSearch = (Button) findViewById(R.id.btnSearch);
 
-        articles = new ArrayList<>();
-        adapter = new ArticleArrayAdapter(this, articles);
-        gvResults.setAdapter(adapter);
+        mArticles = new ArrayList<>();
+        mAdapter = new ArticleArrayAdapter(this, mArticles);
+        gvResults.setAdapter(mAdapter);
 
         // Hook up listener for grid click.
         gvResults.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -67,7 +68,7 @@ public class SearchActivity extends AppCompatActivity {
                 Intent intent = new Intent(getApplicationContext(), ArticleActivity.class);
 
                 // Get the article to display.
-                Article article = articles.get(i);
+                Article article = mArticles.get(i);
 
                 // Pass in that article intent.
                 intent.putExtra("article", article);
@@ -91,21 +92,25 @@ public class SearchActivity extends AppCompatActivity {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch (item.getItemId()) {
+            case R.id.action_filter:
+                showFilters();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
 
-        return super.onOptionsItemSelected(item);
+    }
+
+    private void showFilters() {
+        Toast.makeText(this, "Hola!", Toast.LENGTH_LONG).show();
     }
 
     public void onArticleSearch(View view) {
 
         String query = etQuery.getText().toString();
 
-        //Toast.makeText(this, "Searching for: " + query, Toast.LENGTH_LONG).show();
         AsyncHttpClient client = new AsyncHttpClient();
         String url = "http://api.nytimes.com/svc/search/v2/articlesearch.json";
 
@@ -124,9 +129,9 @@ public class SearchActivity extends AppCompatActivity {
                 try {
                     articleJsonResults = response.getJSONObject("response").getJSONArray("docs");
 
-                    articles.addAll(Article.fromJsonArray(articleJsonResults));
-                    adapter.notifyDataSetChanged();
-                    Log.d("DEBUG", articles.toString());
+                    mArticles.addAll(Article.fromJsonArray(articleJsonResults));
+                    mAdapter.notifyDataSetChanged();
+                    Log.d("DEBUG", mArticles.toString());
                 } catch(JSONException e) {
                     e.printStackTrace();
                 }
