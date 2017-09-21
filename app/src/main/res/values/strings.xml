@@ -3,4 +3,11 @@
     <string name="action_filter">Filter</string>
     <string name="hint">Enter search query</string>
     <string name="search">Search</string>
+    <string name="arts">Arts</string>
+    <string name="fashion_style">Fashion and style</string>
+    <string name="sports">Sports</string>
+    <string name="news_desk_values">News desk values</string>
+    <string name="sort_order">Sort order</string>
+    <string name="begin_date">Begin date</string>
+    <string name="save">Save</string>
 </resources>
