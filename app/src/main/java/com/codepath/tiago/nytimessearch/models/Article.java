@@ -16,6 +16,7 @@ public class Article implements Serializable {
 
     String mWebUrl;
     String mHeadline;
+    String mSnippet;
     String mThumbnail;
 
     public String getWebUrl() {
@@ -26,6 +27,8 @@ public class Article implements Serializable {
         return mHeadline;
     }
 
+    public String getmSnippet() { return mSnippet; }
+
     public String getThumbnail() {
         return String.format("http://www.nytimes.com/%s", mThumbnail);
     }
@@ -35,6 +38,7 @@ public class Article implements Serializable {
 
             this.mWebUrl = jsonObject.getString("web_url");
             this.mHeadline = jsonObject.getJSONObject("headline").getString("main");
+            this.mSnippet = jsonObject.getString("snippet");
 
             JSONArray multimedia = jsonObject.getJSONArray("multimedia");
 

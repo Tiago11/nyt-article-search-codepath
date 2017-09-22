@@ -3,8 +3,8 @@ package com.codepath.tiago.nytimessearch.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -21,6 +21,7 @@ import com.codepath.tiago.nytimessearch.models.Filter;
 import com.codepath.tiago.nytimessearch.network.ArticleClient;
 import com.codepath.tiago.nytimessearch.utils.EndlessRecyclerViewScrollListener;
 import com.codepath.tiago.nytimessearch.utils.ItemClickSupport;
+import com.codepath.tiago.nytimessearch.utils.SpacesItemDecoration;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.json.JSONArray;
@@ -34,15 +35,17 @@ import cz.msebera.android.httpclient.Header;
 
 public class SearchActivity extends AppCompatActivity {
 
+    // Views.
     EditText etQuery;
     RecyclerView rvResults;
     Button btnSearch;
 
+    // Models and adapter.
     List<Article> mArticles;
     ArticlesAdapter mAdapter;
     Filter mFilter;
 
-    // Store a member variable for the scroll listener.
+    // Reference to the scroll listener.
     private EndlessRecyclerViewScrollListener mScrollListener;
 
     private final int REQUEST_CODE_FILTER_ACTIVITY = 20;
@@ -59,11 +62,11 @@ public class SearchActivity extends AppCompatActivity {
         // Find references to the views in the layout.
         setupViews();
 
-        // Set the adapter for the GridView.
+        // Set the adapter for the RecyclerView.
         setupAdapter();
 
-        // Set the listeners.
-        setupListeners();
+        // Set the RecyclerView onItemClickListener.
+        setupOnItemClickListener();
     }
 
     /*
@@ -84,13 +87,11 @@ public class SearchActivity extends AppCompatActivity {
 
         mAdapter = new ArticlesAdapter(this, mArticles);
         rvResults.setAdapter(mAdapter);
-        //GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 3);
-        //rvResults.setLayoutManager(gridLayoutManager);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        rvResults.setLayoutManager(linearLayoutManager);
+        StaggeredGridLayoutManager gridLayoutManager =
+                new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
+        rvResults.setLayoutManager(gridLayoutManager);
         // Retain an instance so that you can call 'resetState()' for fresh searches.
-        //mScrollListener = new EndlessRecyclerViewScrollListener(gridLayoutManager) {
-        mScrollListener = new EndlessRecyclerViewScrollListener(linearLayoutManager) {
+        mScrollListener = new EndlessRecyclerViewScrollListener(gridLayoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
                 // Triggered only when new data needs to be appended to the list.
@@ -99,13 +100,17 @@ public class SearchActivity extends AppCompatActivity {
         };
         // Adds the scroll listener to RecyclerView.
         rvResults.addOnScrollListener(mScrollListener);
+
+        // Add dividers to the grid.
+        SpacesItemDecoration decoration = new SpacesItemDecoration(20);
+        rvResults.addItemDecoration(decoration);
     }
 
     /*
-     * Set the on item click listener for the |gvResults| GridView. It creates the intent for the
+     * Set the on item click listener for the |rvResults| RecyclerView. It creates the intent for the
      * ArticleActivity, passes the article clicked to it and calls the new activity.
      */
-    private void setupListeners() {
+    private void setupOnItemClickListener() {
         // Hook up the listener for recyclerview item click.
         ItemClickSupport.addTo(rvResults).setOnItemClickListener(
                 new ItemClickSupport.OnItemClickListener() {
@@ -113,10 +118,8 @@ public class SearchActivity extends AppCompatActivity {
                     public void onItemClicked(RecyclerView recyclerView, int position, View v) {
                         // Create an intent to display the article.
                         Intent intent = new Intent(SearchActivity.this, ArticleActivity.class);
-
                         // Get the article to display.
                         Article article = mArticles.get(position);
-
                         // Pass in that article intent.
                         intent.putExtra("article", article);
 
@@ -142,6 +145,7 @@ public class SearchActivity extends AppCompatActivity {
 
         switch (item.getItemId()) {
             case R.id.action_filter:
+                // Start the filterActivity.
                 showFilters();
                 return true;
             default:
@@ -169,6 +173,7 @@ public class SearchActivity extends AppCompatActivity {
 
     /*
      * Event fired when the user provides a query for the search.
+     * Makes the API call with that query and the filters (if any), and populates the row views.
      */
     public void onArticleSearch(View view) {
 
@@ -197,31 +202,7 @@ public class SearchActivity extends AppCompatActivity {
         articleClient.getArticlesNextPage(query, offset, mFilter, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                JSONArray articleJsonResults = null;
-                try {
-                    articleJsonResults = response.getJSONObject("response").getJSONArray("docs");
-
-                    // record this value before making any changes to the existing list.
-                    int curSize = mAdapter.getItemCount();
-
-                    // replace this line with wherever you get new records.
-                    // update the existing list.
-                    List<Article> newArticles = Article.fromJsonArray(articleJsonResults);
-
-                    Log.d("HOLA", "PRIMER ART: " + newArticles.get(0).getHeadline());
-                    Log.d("HOLA", "SIZE: " + newArticles.size());
-
-                    mArticles.addAll(newArticles);
-
-                    Log.d("HOLA", "Size: " + mArticles.size());
-
-                    // curSize should represent the first element that got added.
-                    // newItems.size() represents the itemCount.
-                    mAdapter.notifyItemRangeInserted(curSize, newArticles.size());
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                onApiCallSuccess(statusCode, headers, response);
             }
 
             @Override
@@ -244,26 +225,7 @@ public class SearchActivity extends AppCompatActivity {
         articleClient.getArticles(query, mFilter, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                JSONArray articleJsonResults = null;
-
-                try {
-                    articleJsonResults = response.getJSONObject("response").getJSONArray("docs");
-
-                    // record this value before making any changes to the existing list.
-                    int curSize = mAdapter.getItemCount();
-
-                    // replace this line with wherever you get new records.
-                    // update the existing list.
-                    List<Article> newArticles = Article.fromJsonArray(articleJsonResults);
-                    mArticles.addAll(newArticles);
-
-                    // curSize should represent the first element that got added.
-                    // newItems.size() represents the itemCount.
-                    mAdapter.notifyItemRangeInserted(curSize, newArticles.size());
-
-                } catch(JSONException e) {
-                    e.printStackTrace();
-                }
+                onApiCallSuccess(statusCode, headers, response);
             }
 
             @Override
@@ -272,5 +234,32 @@ public class SearchActivity extends AppCompatActivity {
                 Log.d("ERROR", "status: " + statusCode + " response: " + responseString);
             }
         });
+    }
+
+    /*
+     * Parses the JSON response, creates model objects from it and
+     * notifies the adapter to update the views.
+     */
+    private void onApiCallSuccess(int statusCode, Header[] headers, JSONObject response) {
+        JSONArray articleJsonResults = null;
+
+        try {
+            articleJsonResults = response.getJSONObject("response").getJSONArray("docs");
+
+            // record this value before making any changes to the existing list.
+            int curSize = mAdapter.getItemCount();
+
+            // replace this line with wherever you get new records.
+            // update the existing list.
+            List<Article> newArticles = Article.fromJsonArray(articleJsonResults);
+            mArticles.addAll(newArticles);
+
+            // curSize should represent the first element that got added.
+            // newItems.size() represents the itemCount.
+            mAdapter.notifyItemRangeInserted(curSize, newArticles.size());
+
+        } catch(JSONException e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -80,7 +80,7 @@ public class ArticleClient {
                 }
             }
 
-            params.put("fl", "web_url, multimedia, news_desk, headline");
+            params.put("fl", "web_url, multimedia, news_desk, headline, snippet");
             params.put("page", page);
             params.put("api-key", NYT_API_KEY);
         } catch(UnsupportedEncodingException e) {

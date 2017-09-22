@@ -21,26 +21,6 @@ import java.util.List;
 
 public class ArticlesAdapter extends RecyclerView.Adapter<ArticlesAdapter.ViewHolder> {
 
-    // Provide a direct reference to each of the views within a data item.
-    // Used to cache the views within the item layout for fast access.
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        // Your holder should contain a member variable
-        // for any view that will be set as you render a row.
-        public TextView tvTitle;
-        public ImageView ivImage;
-
-        // We also create a constructor that accepts the entire item row
-        // and does the view lookups to find each subview.
-        public ViewHolder(View itemView) {
-            // Stores the itemView in a public final member variable that can be used
-            // to access the context from any ViewHolder instance.
-            super(itemView);
-
-            tvTitle = (TextView) itemView.findViewById(R.id.tvTitle);
-            ivImage = (ImageView) itemView.findViewById(R.id.ivImage);
-        }
-    }
-
     // Store a member variable for the articles.
     private List<Article> mArticles;
     // Store the context for easy access.
@@ -76,15 +56,8 @@ public class ArticlesAdapter extends RecyclerView.Adapter<ArticlesAdapter.ViewHo
     public void onBindViewHolder(ArticlesAdapter.ViewHolder viewHolder, int position) {
         // Get the data model based on position.
         Article article = mArticles.get(position);
-
-        // Set item views based on your views and data model.
-        viewHolder.tvTitle.setText(article.getHeadline());
-        // Populate the image thumbnail.
-        String thumbnail = article.getThumbnail();
-
-        if (!TextUtils.isEmpty(thumbnail)) {
-            Picasso.with(getContext()).load(thumbnail).into(viewHolder.ivImage);
-        }
+        // Bind the data to the viewHolder.
+        viewHolder.bind(article);
     }
 
     // Returns the total count of items in the list.
@@ -93,4 +66,41 @@ public class ArticlesAdapter extends RecyclerView.Adapter<ArticlesAdapter.ViewHo
         return mArticles.size();
     }
 
+    // Provide a direct reference to each of the views within a data item.
+    // Used to cache the views within the item layout for fast access.
+    public class ViewHolder extends RecyclerView.ViewHolder {
+        // Your holder should contain a member variable
+        // for any view that will be set as you render a row.
+        public TextView tvTitle;
+        public TextView tvSnippet;
+        public ImageView ivImage;
+
+        // We also create a constructor that accepts the entire item row
+        // and does the view lookups to find each subview.
+        public ViewHolder(View itemView) {
+            // Stores the itemView in a public final member variable that can be used
+            // to access the context from any ViewHolder instance.
+            super(itemView);
+
+            tvTitle = (TextView) itemView.findViewById(R.id.tvTitle);
+            tvSnippet = (TextView) itemView.findViewById(R.id.tvSnippet);
+            ivImage = (ImageView) itemView.findViewById(R.id.ivImage);
+        }
+
+        /*
+         *
+         */
+        public void bind(Article article) {
+
+            // Set item views based on your views and data model.
+            this.tvTitle.setText(article.getHeadline());
+            this.tvSnippet.setText(article.getmSnippet());
+            // Populate the image thumbnail.
+            String thumbnail = article.getThumbnail();
+
+            if (!TextUtils.isEmpty(thumbnail)) {
+                Picasso.with(getContext()).load(thumbnail).into(this.ivImage);
+            }
+        }
+    }
 }
