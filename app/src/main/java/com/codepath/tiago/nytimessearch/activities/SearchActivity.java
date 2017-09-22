@@ -19,6 +19,7 @@ import com.codepath.tiago.nytimessearch.adapters.ArticleArrayAdapter;
 import com.codepath.tiago.nytimessearch.models.Article;
 import com.codepath.tiago.nytimessearch.models.Filter;
 import com.codepath.tiago.nytimessearch.network.ArticleClient;
+import com.codepath.tiago.nytimessearch.utils.EndlessScrollListener;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.json.JSONArray;
@@ -57,8 +58,8 @@ public class SearchActivity extends AppCompatActivity {
         // Set the adapter for the GridView.
         setupAdapter();
 
-        // Set the click listeners.
-        setupClickListeners();
+        // Set the listeners.
+        setupListeners();
     }
 
     /*
@@ -84,8 +85,22 @@ public class SearchActivity extends AppCompatActivity {
      * Set the on item click listener for the |gvResults| GridView. It creates the intent for the
      * ArticleActivity, passes the article clicked to it and calls the new activity.
      */
-    private void setupClickListeners() {
-        // Hook up listener for grid click.
+    private void setupListeners() {
+        // Hook up the listener for endless scrolling.
+        gvResults.setOnScrollListener(new EndlessScrollListener() {
+            @Override
+            public boolean onLoadMore(int page, int totalItemsCount) {
+                // Triggered only when new data needs to be appended to the list.
+                // Add whatever code is needed to append new items to your AdapterView.
+                // TODO remove Toast under this.
+                Toast.makeText(SearchActivity.this, "Page: " + page, Toast.LENGTH_LONG).show();
+                loadNextDataFromApi(page);
+                // or loadNextDataFromApi(totalItemsCount);
+                return true; // ONLY if more data is actually being loaded; false otherwise.
+            }
+        });
+
+        // Hook up the listener for grid click.
         gvResults.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -132,7 +147,6 @@ public class SearchActivity extends AppCompatActivity {
         if (resultCode == RESULT_OK && requestCode == REQUEST_CODE_FILTER_ACTIVITY) {
             // Set the filter.
             mFilter = (Filter) data.getSerializableExtra("filter");
-            Toast.makeText(this, mFilter.getBeginDateString(), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -160,6 +174,51 @@ public class SearchActivity extends AppCompatActivity {
         // Make the API call to get the articles for this query..
         fetchArticles(query);
 
+    }
+
+    /*
+     * Append the next page of data into the adapter.
+     * This method sends out a network request and appends new data items to your adapter.
+     */
+    public void loadNextDataFromApi(int offset) {
+        // Send an API request to retrieve appropriate paginated data
+        //  --> Send the request including an offset value (i.e `page`) as a query parameter.
+        String query = etQuery.getText().toString();
+        ArticleClient articleClient = new ArticleClient();
+        articleClient.getArticlesNextPage(query, offset, mFilter, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                JSONArray articleJsonResults = null;
+                try {
+                    articleJsonResults = response.getJSONObject("response").getJSONArray("docs");
+
+                    List<Article> arr = Article.fromJsonArray(articleJsonResults);
+
+                    Log.d("HOLA", "PRIMER ART: " + arr.get(0).getHeadline());
+                    Log.d("HOLA", "SIZE: " + arr.size());
+
+                    mArticles.addAll(arr);
+
+                    Log.d("HOLA", "Size: " + mArticles.size());
+
+
+                    mAdapter.notifyDataSetChanged();
+
+
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                Log.d("ERROR", "status: " + statusCode + " response: " + responseString);
+            }
+            //  --> Deserialize and construct new model objects from the API response
+            //  --> Append the new data objects to the existing set of items inside the array of items
+            //  --> Notify the adapter of the new items made with `notifyDataSetChanged()`
+        });
     }
 
     /*

@@ -33,15 +33,24 @@ public class ArticleClient {
         String url = getApiUrl(this.relative_url);
 
         // Get all the params that will be included in the request according to
-        // the query and the filter settings.
-        RequestParams params = getRequestParams(query, filter);
+        // the query and the filter settings. We get the first page (number 0).
+        RequestParams params = getRequestParams(query, 0, filter);
 
         // Make the API call.
         client.get(url, params, handler);
 
     }
 
-    private RequestParams getRequestParams(String query, Filter filter) {
+    public void getArticlesNextPage(String query, int page, Filter filter, JsonHttpResponseHandler handler) {
+        String url = getApiUrl(this.relative_url);
+
+        RequestParams params = getRequestParams(query, page, filter);
+
+        // Make the API call.
+        client.get(url, params, handler);
+    }
+
+    private RequestParams getRequestParams(String query, int page, Filter filter) {
 
         RequestParams params = new RequestParams();
         try {
@@ -72,7 +81,7 @@ public class ArticleClient {
             }
 
             params.put("fl", "web_url, multimedia, news_desk, headline");
-            params.put("page", 0);
+            params.put("page", page);
             params.put("api-key", NYT_API_KEY);
         } catch(UnsupportedEncodingException e) {
             e.printStackTrace();
