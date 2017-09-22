@@ -19,6 +19,7 @@ import com.codepath.tiago.nytimessearch.adapters.ArticlesAdapter;
 import com.codepath.tiago.nytimessearch.models.Article;
 import com.codepath.tiago.nytimessearch.models.Filter;
 import com.codepath.tiago.nytimessearch.network.ArticleClient;
+import com.codepath.tiago.nytimessearch.utils.EndlessRecyclerViewScrollListener;
 import com.codepath.tiago.nytimessearch.utils.ItemClickSupport;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
@@ -40,6 +41,9 @@ public class SearchActivity extends AppCompatActivity {
     List<Article> mArticles;
     ArticlesAdapter mAdapter;
     Filter mFilter;
+
+    // Store a member variable for the scroll listener.
+    private EndlessRecyclerViewScrollListener mScrollListener;
 
     private final int REQUEST_CODE_FILTER_ACTIVITY = 20;
 
@@ -73,15 +77,28 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     /*
-     * Initialize and set the Adapter for the |mArticles| collection and the |gvResults| GridView.
+     * Initialize and set the Adapter for the |mArticles| collection and the |rvResults| RecyclerView.
      */
     private void setupAdapter() {
         mArticles = new ArrayList<>();
 
         mAdapter = new ArticlesAdapter(this, mArticles);
         rvResults.setAdapter(mAdapter);
-        //rvResults.setLayoutManager(new GridLayoutManager(this, 1));
-        rvResults.setLayoutManager(new LinearLayoutManager(this));
+        //GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 3);
+        //rvResults.setLayoutManager(gridLayoutManager);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        rvResults.setLayoutManager(linearLayoutManager);
+        // Retain an instance so that you can call 'resetState()' for fresh searches.
+        //mScrollListener = new EndlessRecyclerViewScrollListener(gridLayoutManager) {
+        mScrollListener = new EndlessRecyclerViewScrollListener(linearLayoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                // Triggered only when new data needs to be appended to the list.
+                loadNextDataFromApi(page);
+            }
+        };
+        // Adds the scroll listener to RecyclerView.
+        rvResults.addOnScrollListener(mScrollListener);
     }
 
     /*
@@ -89,21 +106,6 @@ public class SearchActivity extends AppCompatActivity {
      * ArticleActivity, passes the article clicked to it and calls the new activity.
      */
     private void setupListeners() {
-        /*
-        // Hook up the listener for endless scrolling.
-        gvResults.setOnScrollListener(new EndlessScrollListener() {
-            @Override
-            public boolean onLoadMore(int page, int totalItemsCount) {
-                // Triggered only when new data needs to be appended to the list.
-                // Add whatever code is needed to append new items to your AdapterView.
-                // TODO remove Toast under this.
-                Toast.makeText(SearchActivity.this, "Page: " + page, Toast.LENGTH_LONG).show();
-                loadNextDataFromApi(page);
-                // or loadNextDataFromApi(totalItemsCount);
-                return true; // ONLY if more data is actually being loaded; false otherwise.
-            }
-        });
-        */
         // Hook up the listener for recyclerview item click.
         ItemClickSupport.addTo(rvResults).setOnItemClickListener(
                 new ItemClickSupport.OnItemClickListener() {
@@ -176,6 +178,8 @@ public class SearchActivity extends AppCompatActivity {
         // Clear the results of the previous search.
         mArticles.clear();
         mAdapter.notifyDataSetChanged();
+        // Reset endless scroll listener because we are performing a new search.
+        mScrollListener.resetState();
 
         // Make the API call to get the articles for this query..
         fetchArticles(query);
