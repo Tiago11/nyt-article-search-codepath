@@ -12,6 +12,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.Toast;
 
 import com.codepath.tiago.nytimessearch.R;
 import com.codepath.tiago.nytimessearch.adapters.ArticleArrayAdapter;
@@ -131,7 +132,7 @@ public class SearchActivity extends AppCompatActivity {
         if (resultCode == RESULT_OK && requestCode == REQUEST_CODE_FILTER_ACTIVITY) {
             // Set the filter.
             mFilter = (Filter) data.getSerializableExtra("filter");
-
+            Toast.makeText(this, mFilter.getBeginDateString(), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -152,19 +153,23 @@ public class SearchActivity extends AppCompatActivity {
         // Get the query made by the user.
         String query = etQuery.getText().toString();
 
-        // Make the API call to get the articles for this query.
+        // Clear the results of the previous search.
+        mArticles.clear();
+        mAdapter.notifyDataSetChanged();
+
+        // Make the API call to get the articles for this query..
         fetchArticles(query);
 
     }
 
     /*
-     * Fetch the articles from the API using the query |query|, and set the results into
-     * the collection, notifying the adapter.
+     * Fetch the articles from the API using the query |query| and the current filters |mFilter|,
+     * and set the results into the collection, notifying the adapter.
      */
     private void fetchArticles(String query) {
         // Create an article client.
         ArticleClient articleClient = new ArticleClient();
-        articleClient.getArticles(query, new JsonHttpResponseHandler() {
+        articleClient.getArticles(query, mFilter, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 JSONArray articleJsonResults = null;
@@ -178,6 +183,11 @@ public class SearchActivity extends AppCompatActivity {
                 } catch(JSONException e) {
                     e.printStackTrace();
                 }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                Toast.makeText(SearchActivity.this, "Error in the API call", Toast.LENGTH_LONG).show();
             }
         });
     }

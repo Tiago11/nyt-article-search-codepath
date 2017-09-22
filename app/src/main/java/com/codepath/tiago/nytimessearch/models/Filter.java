@@ -1,6 +1,7 @@
 package com.codepath.tiago.nytimessearch.models;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -23,7 +24,7 @@ public class Filter implements Serializable {
     // Enum with the possible news desk values.
     public enum NewsDeskValues {
         ARTS,
-        FASHIONSTYLE,
+        FASHION_STYLE,
         SPORTS;
     }
 
@@ -36,7 +37,8 @@ public class Filter implements Serializable {
 
     // Getters.
     public String getBeginDateString() {
-        return this.beginDate.toString();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
+        return formatter.format(this.beginDate);
     }
 
     public Date getBeginDate() {
@@ -63,5 +65,9 @@ public class Filter implements Serializable {
     // Predicates.
     public boolean hasNewsDeskValue(NewsDeskValues newsDeskValue) {
         return (this.newsDeskValues.contains(newsDeskValue));
+    }
+
+    public int getNewsDeskValueSize() {
+        return this.newsDeskValues.size();
     }
 }

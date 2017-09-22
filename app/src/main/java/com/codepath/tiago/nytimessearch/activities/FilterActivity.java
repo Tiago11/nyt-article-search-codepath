@@ -83,7 +83,7 @@ public class FilterActivity extends AppCompatActivity {
                 cbArts.setChecked(false);
             }
 
-            if (filter.hasNewsDeskValue(Filter.NewsDeskValues.FASHIONSTYLE)) {
+            if (filter.hasNewsDeskValue(Filter.NewsDeskValues.FASHION_STYLE)) {
                 cbFashionStyle.setChecked(true);
             } else {
                 cbFashionStyle.setChecked(false);
@@ -139,7 +139,7 @@ public class FilterActivity extends AppCompatActivity {
             newsDeskValuesSet.add(Filter.NewsDeskValues.ARTS);
         }
         if (cbFashionStyle.isChecked()) {
-            newsDeskValuesSet.add(Filter.NewsDeskValues.FASHIONSTYLE);
+            newsDeskValuesSet.add(Filter.NewsDeskValues.FASHION_STYLE);
         }
         if (cbSports.isChecked()) {
             newsDeskValuesSet.add(Filter.NewsDeskValues.SPORTS);

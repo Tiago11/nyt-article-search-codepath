@@ -1,5 +1,6 @@
 package com.codepath.tiago.nytimessearch.network;
 
+import com.codepath.tiago.nytimessearch.models.Filter;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -27,19 +28,56 @@ public class ArticleClient {
         return NYT_API_BASE_URL + relative_url;
     }
 
-    public void getArticles(String query, JsonHttpResponseHandler handler) {
-        try {
-            String url = getApiUrl(this.relative_url);
+    public void getArticles(String query, Filter filter, JsonHttpResponseHandler handler) {
 
-            RequestParams params = new RequestParams();
-            params.put("api-key", NYT_API_KEY);
-            params.put("page", 0);
+        String url = getApiUrl(this.relative_url);
+
+        // Get all the params that will be included in the request according to
+        // the query and the filter settings.
+        RequestParams params = getRequestParams(query, filter);
+
+        // Make the API call.
+        client.get(url, params, handler);
+
+    }
+
+    private RequestParams getRequestParams(String query, Filter filter) {
+
+        RequestParams params = new RequestParams();
+        try {
             params.put("q", URLEncoder.encode(query, "utf-8"));
 
-            client.get(url, params, handler);
+            if (filter != null) {
+                // Translate filter settings into request params.
+                params.put("begin_date", filter.getBeginDateString());
+                if (filter.getSortOrder() == Filter.SortValues.OLDEST) {
+                    params.put("sort", "oldest");
+                } else if (filter.getSortOrder() == Filter.SortValues.NEWEST) {
+                    params.put("sort", "newest");
+                }
 
+                if (filter.getNewsDeskValueSize() > 0) {
+                    String values = "";
+                    if (filter.hasNewsDeskValue(Filter.NewsDeskValues.ARTS)) {
+                        values += "\"Arts\", ";
+                    }
+                    if (filter.hasNewsDeskValue(Filter.NewsDeskValues.FASHION_STYLE)) {
+                        values += "\"Fashion & Style\"";
+                    }
+                    if (filter.hasNewsDeskValue(Filter.NewsDeskValues.SPORTS)) {
+                        values += "\"Sports\"";
+                    }
+                    params.put("fq", "news_desk:(" + values + ")");
+                }
+            }
+
+            params.put("fl", "web_url, multimedia, news_desk, headline");
+            params.put("page", 0);
+            params.put("api-key", NYT_API_KEY);
         } catch(UnsupportedEncodingException e) {
             e.printStackTrace();
         }
+
+        return params;
     }
 }
