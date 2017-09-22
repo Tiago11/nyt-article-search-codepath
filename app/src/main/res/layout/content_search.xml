@@ -31,11 +31,11 @@
         android:hint="@string/hint"
         android:inputType="textPersonName" />
 
-    <GridView
-        android:id="@+id/gvResults"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rvResults"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/etQuery"
-        android:layout_centerHorizontal="true"
-        android:numColumns="3" />
+        android:layout_centerHorizontal="true" />
+
 </RelativeLayout>

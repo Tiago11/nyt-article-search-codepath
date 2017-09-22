@@ -3,23 +3,22 @@ package com.codepath.tiago.nytimessearch.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.GridView;
 import android.widget.Toast;
 
 import com.codepath.tiago.nytimessearch.R;
-import com.codepath.tiago.nytimessearch.adapters.ArticleArrayAdapter;
+import com.codepath.tiago.nytimessearch.adapters.ArticlesAdapter;
 import com.codepath.tiago.nytimessearch.models.Article;
 import com.codepath.tiago.nytimessearch.models.Filter;
 import com.codepath.tiago.nytimessearch.network.ArticleClient;
-import com.codepath.tiago.nytimessearch.utils.EndlessScrollListener;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.json.JSONArray;
@@ -34,11 +33,11 @@ import cz.msebera.android.httpclient.Header;
 public class SearchActivity extends AppCompatActivity {
 
     EditText etQuery;
-    GridView gvResults;
+    RecyclerView rvResults;
     Button btnSearch;
 
     List<Article> mArticles;
-    ArticleArrayAdapter mAdapter;
+    ArticlesAdapter mAdapter;
     Filter mFilter;
 
     private final int REQUEST_CODE_FILTER_ACTIVITY = 20;
@@ -59,7 +58,7 @@ public class SearchActivity extends AppCompatActivity {
         setupAdapter();
 
         // Set the listeners.
-        setupListeners();
+        //setupListeners();
     }
 
     /*
@@ -67,7 +66,7 @@ public class SearchActivity extends AppCompatActivity {
      */
     private void setupViews() {
         etQuery = (EditText) findViewById(R.id.etQuery);
-        gvResults = (GridView) findViewById(R.id.gvResults);
+        rvResults = (RecyclerView) findViewById(R.id.rvResults);
         btnSearch = (Button) findViewById(R.id.btnSearch);
         mFilter = null;
     }
@@ -77,8 +76,10 @@ public class SearchActivity extends AppCompatActivity {
      */
     private void setupAdapter() {
         mArticles = new ArrayList<>();
-        mAdapter = new ArticleArrayAdapter(this, mArticles);
-        gvResults.setAdapter(mAdapter);
+
+        mAdapter = new ArticlesAdapter(this, mArticles);
+        rvResults.setAdapter(mAdapter);
+        rvResults.setLayoutManager(new GridLayoutManager(this, 1));
     }
 
     /*
@@ -86,6 +87,7 @@ public class SearchActivity extends AppCompatActivity {
      * ArticleActivity, passes the article clicked to it and calls the new activity.
      */
     private void setupListeners() {
+        /*
         // Hook up the listener for endless scrolling.
         gvResults.setOnScrollListener(new EndlessScrollListener() {
             @Override
@@ -117,6 +119,7 @@ public class SearchActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        */
     }
 
     @Override
@@ -173,7 +176,6 @@ public class SearchActivity extends AppCompatActivity {
 
         // Make the API call to get the articles for this query..
         fetchArticles(query);
-
     }
 
     /*
@@ -192,19 +194,23 @@ public class SearchActivity extends AppCompatActivity {
                 try {
                     articleJsonResults = response.getJSONObject("response").getJSONArray("docs");
 
-                    List<Article> arr = Article.fromJsonArray(articleJsonResults);
+                    // record this value before making any changes to the existing list.
+                    int curSize = mAdapter.getItemCount();
 
-                    Log.d("HOLA", "PRIMER ART: " + arr.get(0).getHeadline());
-                    Log.d("HOLA", "SIZE: " + arr.size());
+                    // replace this line with wherever you get new records.
+                    // update the existing list.
+                    List<Article> newArticles = Article.fromJsonArray(articleJsonResults);
 
-                    mArticles.addAll(arr);
+                    Log.d("HOLA", "PRIMER ART: " + newArticles.get(0).getHeadline());
+                    Log.d("HOLA", "SIZE: " + newArticles.size());
+
+                    mArticles.addAll(newArticles);
 
                     Log.d("HOLA", "Size: " + mArticles.size());
 
-
-                    mAdapter.notifyDataSetChanged();
-
-
+                    // curSize should represent the first element that got added.
+                    // newItems.size() represents the itemCount.
+                    mAdapter.notifyItemRangeInserted(curSize, newArticles.size());
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -236,9 +242,18 @@ public class SearchActivity extends AppCompatActivity {
                 try {
                     articleJsonResults = response.getJSONObject("response").getJSONArray("docs");
 
-                    mArticles.addAll(Article.fromJsonArray(articleJsonResults));
-                    mAdapter.notifyDataSetChanged();
-                    Log.d("DEBUG", mArticles.toString());
+                    // record this value before making any changes to the existing list.
+                    int curSize = mAdapter.getItemCount();
+
+                    // replace this line with wherever you get new records.
+                    // update the existing list.
+                    List<Article> newArticles = Article.fromJsonArray(articleJsonResults);
+                    mArticles.addAll(newArticles);
+
+                    // curSize should represent the first element that got added.
+                    // newItems.size() represents the itemCount.
+                    mAdapter.notifyItemRangeInserted(curSize, newArticles.size());
+
                 } catch(JSONException e) {
                     e.printStackTrace();
                 }
@@ -247,6 +262,7 @@ public class SearchActivity extends AppCompatActivity {
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                 Toast.makeText(SearchActivity.this, "Error in the API call", Toast.LENGTH_LONG).show();
+                Log.d("ERROR", "status: " + statusCode + " response: " + responseString);
             }
         });
     }
