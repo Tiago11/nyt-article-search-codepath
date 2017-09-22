@@ -3,7 +3,7 @@ package com.codepath.tiago.nytimessearch.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -19,6 +19,7 @@ import com.codepath.tiago.nytimessearch.adapters.ArticlesAdapter;
 import com.codepath.tiago.nytimessearch.models.Article;
 import com.codepath.tiago.nytimessearch.models.Filter;
 import com.codepath.tiago.nytimessearch.network.ArticleClient;
+import com.codepath.tiago.nytimessearch.utils.ItemClickSupport;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.json.JSONArray;
@@ -58,7 +59,7 @@ public class SearchActivity extends AppCompatActivity {
         setupAdapter();
 
         // Set the listeners.
-        //setupListeners();
+        setupListeners();
     }
 
     /*
@@ -79,7 +80,8 @@ public class SearchActivity extends AppCompatActivity {
 
         mAdapter = new ArticlesAdapter(this, mArticles);
         rvResults.setAdapter(mAdapter);
-        rvResults.setLayoutManager(new GridLayoutManager(this, 1));
+        //rvResults.setLayoutManager(new GridLayoutManager(this, 1));
+        rvResults.setLayoutManager(new LinearLayoutManager(this));
     }
 
     /*
@@ -101,25 +103,26 @@ public class SearchActivity extends AppCompatActivity {
                 return true; // ONLY if more data is actually being loaded; false otherwise.
             }
         });
-
-        // Hook up the listener for grid click.
-        gvResults.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                // Create an intent to display the article.
-                Intent intent = new Intent(getApplicationContext(), ArticleActivity.class);
-
-                // Get the article to display.
-                Article article = mArticles.get(i);
-
-                // Pass in that article intent.
-                intent.putExtra("article", article);
-
-                // Launch the activity.
-                startActivity(intent);
-            }
-        });
         */
+        // Hook up the listener for recyclerview item click.
+        ItemClickSupport.addTo(rvResults).setOnItemClickListener(
+                new ItemClickSupport.OnItemClickListener() {
+                    @Override
+                    public void onItemClicked(RecyclerView recyclerView, int position, View v) {
+                        // Create an intent to display the article.
+                        Intent intent = new Intent(SearchActivity.this, ArticleActivity.class);
+
+                        // Get the article to display.
+                        Article article = mArticles.get(position);
+
+                        // Pass in that article intent.
+                        intent.putExtra("article", article);
+
+                        // Launch the activity.
+                        startActivity(intent);
+                    }
+                }
+        );
     }
 
     @Override
