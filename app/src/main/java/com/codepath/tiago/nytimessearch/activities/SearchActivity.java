@@ -6,7 +6,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,6 +16,8 @@ import com.codepath.tiago.nytimessearch.R;
 import com.codepath.tiago.nytimessearch.adapters.ArticlesAdapter;
 import com.codepath.tiago.nytimessearch.models.Article;
 import com.codepath.tiago.nytimessearch.models.Filter;
+import com.codepath.tiago.nytimessearch.network.ApiCallHandlers;
+import com.codepath.tiago.nytimessearch.network.ApiCallHandlersBuilder;
 import com.codepath.tiago.nytimessearch.network.ArticleClient;
 import com.codepath.tiago.nytimessearch.network.ConnectivityChecker;
 import com.codepath.tiago.nytimessearch.utils.EndlessRecyclerViewScrollListener;
@@ -24,8 +25,6 @@ import com.codepath.tiago.nytimessearch.utils.ItemClickSupport;
 import com.codepath.tiago.nytimessearch.utils.SpacesItemDecoration;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -201,12 +200,25 @@ public class SearchActivity extends AppCompatActivity {
         articleClient.getArticles(query, mFilter, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                onApiCallSuccess(statusCode, headers, response);
+
+                ApiCallHandlers handlers = ApiCallHandlersBuilder.apiCallHandlers()
+                                                .withResponse(response)
+                                                .withAdapter(mAdapter)
+                                                .withArticles(mArticles)
+                                                .build();
+                handlers.onApiCallSuccess();
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                onApiCallFailure(statusCode, headers, responseString, throwable);
+
+                ApiCallHandlers handlers = ApiCallHandlersBuilder.apiCallHandlers()
+                                                .withStatusCode(statusCode)
+                                                .withResponseString(responseString)
+                                                .withThrowable(throwable)
+                                                .withContext(SearchActivity.this)
+                                                .build();
+                handlers.onApiCallFailure();
             }
         });
     }
@@ -221,52 +233,26 @@ public class SearchActivity extends AppCompatActivity {
         articleClient.getArticlesNextPage(query, offset, mFilter, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                onApiCallSuccess(statusCode, headers, response);
+
+                ApiCallHandlers handlers = ApiCallHandlersBuilder.apiCallHandlers()
+                        .withResponse(response)
+                        .withAdapter(mAdapter)
+                        .withArticles(mArticles)
+                        .build();
+                handlers.onApiCallSuccess();
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                onApiCallFailure(statusCode, headers, responseString, throwable);
+
+                ApiCallHandlers handlers = ApiCallHandlersBuilder.apiCallHandlers()
+                        .withStatusCode(statusCode)
+                        .withResponseString(responseString)
+                        .withThrowable(throwable)
+                        .withContext(SearchActivity.this)
+                        .build();
+                handlers.onApiCallFailure();
             }
         });
-    }
-
-    /*
-     * Parses the JSON response, creates model objects from it and
-     * notifies the adapter to update the views.
-     */
-    private void onApiCallSuccess(int statusCode, Header[] headers, JSONObject response) {
-        JSONArray articleJsonResults = null;
-
-        try {
-            articleJsonResults = response.getJSONObject("response").getJSONArray("docs");
-
-            // record this value before making any changes to the existing list.
-            int curSize = mAdapter.getItemCount();
-
-            // replace this line with wherever you get new records.
-            // update the existing list.
-            List<Article> newArticles = Article.fromJsonArray(articleJsonResults);
-            mArticles.addAll(newArticles);
-
-            // curSize should represent the first element that got added.
-            // newItems.size() represents the itemCount.
-            mAdapter.notifyItemRangeInserted(curSize, newArticles.size());
-
-        } catch(JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void onApiCallFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-        Log.e(TAG, "status: " + statusCode + " response: " + responseString);
-
-        // Check the connectivity.
-        // Displays an alert dialog if there is no connection to inform the user.
-        ConnectivityChecker connectivityChecker = new ConnectivityChecker(SearchActivity.this);
-        connectivityChecker.checkConnectivity();
-
-        // Print stack trace of throwable.
-        throwable.printStackTrace();
     }
 }
