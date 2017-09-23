@@ -1,5 +1,7 @@
 package com.codepath.tiago.nytimessearch.models;
 
+import android.text.TextUtils;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,6 +36,10 @@ public class Article {
     public String getmSnippet() { return mSnippet; }
 
     public String getThumbnail() {
+        if (TextUtils.isEmpty(mThumbnail)) {
+            return null;
+        }
+
         return String.format("http://www.nytimes.com/%s", mThumbnail);
     }
 
