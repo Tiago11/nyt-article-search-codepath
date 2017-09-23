@@ -35,6 +35,9 @@ import cz.msebera.android.httpclient.Header;
 
 public class SearchActivity extends AppCompatActivity {
 
+    // Tag for logging.
+    private final String TAG = SearchActivity.class.toString();
+
     // Views.
     EditText etQuery;
     RecyclerView rvResults;

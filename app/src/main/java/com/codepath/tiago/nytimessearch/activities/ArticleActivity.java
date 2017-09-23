@@ -14,6 +14,9 @@ import com.codepath.tiago.nytimessearch.models.Article;
 
 public class ArticleActivity extends AppCompatActivity {
 
+    // Tag for logging.
+    private final String TAG = ArticleActivity.class.toString();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

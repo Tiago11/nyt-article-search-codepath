@@ -22,6 +22,10 @@ import com.codepath.tiago.nytimessearch.R;
 
 */
 public class ItemClickSupport {
+
+    // Tag for logging.
+    private final String TAG = ItemClickSupport.class.toString();
+
     private final RecyclerView mRecyclerView;
     private OnItemClickListener mOnItemClickListener;
     private OnItemLongClickListener mOnItemLongClickListener;

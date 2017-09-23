@@ -1,17 +1,22 @@
 package com.codepath.tiago.nytimessearch.adapters;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.codepath.tiago.nytimessearch.R;
 import com.codepath.tiago.nytimessearch.models.Article;
+import com.codepath.tiago.nytimessearch.utils.DynamicHeightImageView;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import java.util.List;
 
@@ -20,6 +25,9 @@ import java.util.List;
  */
 
 public class ArticlesAdapter extends RecyclerView.Adapter<ArticlesAdapter.ViewHolder> {
+
+    // Tag for logging.
+    private final String TAG = ArticlesAdapter.class.toString();
 
     // Store a member variable for the articles.
     private List<Article> mArticles;
@@ -68,12 +76,13 @@ public class ArticlesAdapter extends RecyclerView.Adapter<ArticlesAdapter.ViewHo
 
     // Provide a direct reference to each of the views within a data item.
     // Used to cache the views within the item layout for fast access.
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements Target {
         // Your holder should contain a member variable
         // for any view that will be set as you render a row.
         public TextView tvTitle;
         public TextView tvSnippet;
-        public ImageView ivImage;
+        //public ImageView ivImage;
+        public DynamicHeightImageView ivImage;
 
         // We also create a constructor that accepts the entire item row
         // and does the view lookups to find each subview.
@@ -84,8 +93,32 @@ public class ArticlesAdapter extends RecyclerView.Adapter<ArticlesAdapter.ViewHo
 
             tvTitle = (TextView) itemView.findViewById(R.id.tvTitle);
             tvSnippet = (TextView) itemView.findViewById(R.id.tvSnippet);
-            ivImage = (ImageView) itemView.findViewById(R.id.ivImage);
+            ivImage = (DynamicHeightImageView) itemView.findViewById(R.id.ivImage);
         }
+
+        @Override
+        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+            // Calculate the image ratio of the loaded bitmap.
+            float ratio = (float) bitmap.getHeight() / (float) bitmap.getWidth();
+            // Set the ration for the image.
+            ivImage.setHeightRatio(ratio);
+            // Load the image into the view.
+            ivImage.setImageBitmap(bitmap);
+        }
+
+        @Override
+        public void onBitmapFailed(Drawable errorDrawable) {
+            Log.e(TAG, "Error loading a thumbnail image.");
+            Bitmap errorImage = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.error);
+            ivImage.setImageBitmap(errorImage);
+        }
+
+        @Override
+        public void onPrepareLoad(Drawable placeHolderDrawable) {
+            Bitmap placeholderImage = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.placeholder2);
+            ivImage.setImageBitmap(placeholderImage);
+        }
+
 
         /*
          * Sets the article information into their respective views.

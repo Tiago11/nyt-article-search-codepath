@@ -9,6 +9,10 @@ import android.view.View;
  */
 
 public class SpacesItemDecoration extends RecyclerView.ItemDecoration {
+
+    // Tag for logging.
+    private final String TAG = SpacesItemDecoration.class.toString();
+
     private final int mSpace;
 
     public SpacesItemDecoration(int space) {

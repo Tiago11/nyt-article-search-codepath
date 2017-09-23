@@ -11,6 +11,10 @@ import java.util.Set;
  */
 
 public class Filter implements Serializable {
+
+    // Tag for logging.
+    private final String TAG = Filter.class.toString();
+
     Date beginDate;
     SortValues sort;
     Set<NewsDeskValues> newsDeskValues;

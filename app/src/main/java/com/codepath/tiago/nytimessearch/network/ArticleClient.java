@@ -14,6 +14,9 @@ import java.net.URLEncoder;
 
 public class ArticleClient {
 
+    // Tag for logging.
+    private final String TAG = ArticleClient.class.toString();
+
     private final String NYT_API_BASE_URL = "http://api.nytimes.com/svc/search/v2/";
     private final String relative_url = "articlesearch.json";
 

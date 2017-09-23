@@ -19,6 +19,9 @@ import java.util.Set;
 
 public class FilterActivity extends AppCompatActivity {
 
+    // Tag for logging.
+    private final String TAG = FilterActivity.class.toString();
+
     DatePicker dpBeginDate;
     Spinner sSort;
     CheckBox cbArts;

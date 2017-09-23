@@ -14,6 +14,9 @@ import java.util.List;
 
 public class Article implements Serializable {
 
+    // Tag for logging.
+    private final String TAG = Article.class.toString();
+
     String mWebUrl;
     String mHeadline;
     String mSnippet;
