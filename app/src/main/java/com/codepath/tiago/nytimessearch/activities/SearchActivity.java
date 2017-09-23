@@ -26,6 +26,7 @@ import com.codepath.tiago.nytimessearch.utils.SpacesItemDecoration;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.json.JSONObject;
+import org.parceler.Parcels;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -121,7 +122,7 @@ public class SearchActivity extends AppCompatActivity {
                         // Get the article to display.
                         Article article = mArticles.get(position);
                         // Pass in that article intent.
-                        intent.putExtra("article", article);
+                        intent.putExtra("article", Parcels.wrap(article));
 
                         // Launch the activity.
                         startActivity(intent);
@@ -158,7 +159,7 @@ public class SearchActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK && requestCode == REQUEST_CODE_FILTER_ACTIVITY) {
             // Set the filter.
-            mFilter = (Filter) data.getSerializableExtra("filter");
+            mFilter = (Filter) Parcels.unwrap(data.getParcelableExtra("filter"));
         }
     }
 
@@ -167,7 +168,7 @@ public class SearchActivity extends AppCompatActivity {
      */
     private void showFilters() {
         Intent i = new Intent(SearchActivity.this, FilterActivity.class);
-        i.putExtra("filter", mFilter);
+        i.putExtra("filter", Parcels.wrap(mFilter));
         startActivityForResult(i, REQUEST_CODE_FILTER_ACTIVITY);
     }
 

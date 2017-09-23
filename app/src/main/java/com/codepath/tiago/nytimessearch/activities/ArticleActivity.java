@@ -12,6 +12,8 @@ import android.webkit.WebViewClient;
 import com.codepath.tiago.nytimessearch.R;
 import com.codepath.tiago.nytimessearch.models.Article;
 
+import org.parceler.Parcels;
+
 public class ArticleActivity extends AppCompatActivity {
 
     // Tag for logging.
@@ -26,7 +28,7 @@ public class ArticleActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         // Get article from the intent.
-        Article article = (Article) getIntent().getSerializableExtra("article");
+        Article article = (Article) Parcels.unwrap(getIntent().getParcelableExtra("article"));
 
         // Set the WebView to display the article and then load it.
         setupWebView(article);

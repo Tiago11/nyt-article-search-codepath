@@ -12,6 +12,8 @@ import android.widget.Spinner;
 import com.codepath.tiago.nytimessearch.R;
 import com.codepath.tiago.nytimessearch.models.Filter;
 
+import org.parceler.Parcels;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
@@ -38,7 +40,7 @@ public class FilterActivity extends AppCompatActivity {
         setupViews();
 
         // Set the fields using the previous filter information (if any).
-        Filter filter = (Filter) getIntent().getSerializableExtra("filter");
+        Filter filter = (Filter) Parcels.unwrap(getIntent().getParcelableExtra("filter"));
         setFields(filter);
     }
 
@@ -111,7 +113,7 @@ public class FilterActivity extends AppCompatActivity {
 
         // Create the data that will be returned to the SearchActivity.
         Intent data = new Intent();
-        data.putExtra("filter", filter);
+        data.putExtra("filter", Parcels.wrap(filter));
         setResult(RESULT_OK, data);
 
         // Closes the activity.

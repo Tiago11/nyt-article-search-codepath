@@ -1,6 +1,7 @@
 package com.codepath.tiago.nytimessearch.models;
 
-import java.io.Serializable;
+import org.parceler.Parcel;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
@@ -10,10 +11,11 @@ import java.util.Set;
  * Created by tiago on 9/21/17.
  */
 
-public class Filter implements Serializable {
+@Parcel
+public class Filter {
 
     // Tag for logging.
-    private final String TAG = Filter.class.toString();
+    final String TAG = Filter.class.toString();
 
     Date beginDate;
     SortValues sort;

@@ -3,8 +3,8 @@ package com.codepath.tiago.nytimessearch.models;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.parceler.Parcel;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,10 +12,11 @@ import java.util.List;
  * Created by tiago on 9/19/17.
  */
 
-public class Article implements Serializable {
+@Parcel
+public class Article {
 
     // Tag for logging.
-    private final String TAG = Article.class.toString();
+    final String TAG = Article.class.toString();
 
     String mWebUrl;
     String mHeadline;
@@ -34,6 +35,11 @@ public class Article implements Serializable {
 
     public String getThumbnail() {
         return String.format("http://www.nytimes.com/%s", mThumbnail);
+    }
+
+    // Empty constructor (for Parceler).
+    public Article() {
+
     }
 
     // Contructor from a JSON Object.
