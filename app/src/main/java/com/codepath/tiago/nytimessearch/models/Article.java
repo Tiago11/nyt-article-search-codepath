@@ -33,6 +33,7 @@ public class Article implements Serializable {
         return String.format("http://www.nytimes.com/%s", mThumbnail);
     }
 
+    // Contructor from a JSON Object.
     public Article(JSONObject jsonObject) {
         try {
 
@@ -54,6 +55,7 @@ public class Article implements Serializable {
         }
     }
 
+    // Static factory method to create a collection of articles from a JSON Array.
     public static List<Article> fromJsonArray(JSONArray array) {
         ArrayList<Article> results = new ArrayList<>();
 

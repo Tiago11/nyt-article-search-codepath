@@ -37,7 +37,7 @@ public class ArticlesAdapter extends RecyclerView.Adapter<ArticlesAdapter.ViewHo
         return this.mContext;
     }
 
-    // Usually involves inflating a layout from XML and returning the holder.
+    // Inflates a layout from XML and returns it in the ViewHolder.
     @Override
     public ArticlesAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         Context context = parent.getContext();
@@ -51,7 +51,7 @@ public class ArticlesAdapter extends RecyclerView.Adapter<ArticlesAdapter.ViewHo
         return viewHolder;
     }
 
-    // Involves populating data into the item through holder.
+    // Populates data into the viewHolder.
     @Override
     public void onBindViewHolder(ArticlesAdapter.ViewHolder viewHolder, int position) {
         // Get the data model based on position.
@@ -88,7 +88,7 @@ public class ArticlesAdapter extends RecyclerView.Adapter<ArticlesAdapter.ViewHo
         }
 
         /*
-         *
+         * Sets the article information into their respective views.
          */
         public void bind(Article article) {
 

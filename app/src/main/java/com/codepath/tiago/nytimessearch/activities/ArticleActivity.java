@@ -22,8 +22,18 @@ public class ArticleActivity extends AppCompatActivity {
         // Enable up button on the ActionBar.
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        // Get article from the intent.
         Article article = (Article) getIntent().getSerializableExtra("article");
 
+        // Set the WebView to display the article and then load it.
+        setupWebView(article);
+    }
+
+    /*
+     * Sets the necessary properties to show the article in an embedded WebView.
+     * Loads the article into the WebView.
+     */
+    private void setupWebView(Article article) {
         // Get a reference to the WebView.
         WebView webView = (WebView) findViewById(R.id.wvArticle);
         // Configure related browser settings.
@@ -37,7 +47,6 @@ public class ArticleActivity extends AppCompatActivity {
 
         // Load the URL.
         webView.loadUrl(article.getWebUrl());
-
     }
 
     // Manages the behavior when URLs are loaded.

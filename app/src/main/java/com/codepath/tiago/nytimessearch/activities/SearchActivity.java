@@ -62,11 +62,8 @@ public class SearchActivity extends AppCompatActivity {
         // Find references to the views in the layout.
         setupViews();
 
-        // Set the adapter for the RecyclerView.
-        setupAdapter();
-
-        // Set the RecyclerView onItemClickListener.
-        setupOnItemClickListener();
+        // Set the ArticlesAdapter and the RecyclerView.
+        setupAdapterAndRecyclerView();
     }
 
     /*
@@ -80,17 +77,20 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     /*
-     * Initialize and set the Adapter for the |mArticles| collection and the |rvResults| RecyclerView.
+     * Initialize and set listeners for the ArticlesAdapter and for the RecyclerView.
      */
-    private void setupAdapter() {
+    private void setupAdapterAndRecyclerView() {
         mArticles = new ArrayList<>();
 
         mAdapter = new ArticlesAdapter(this, mArticles);
         rvResults.setAdapter(mAdapter);
+
+        // Create and set a StaggeredGridLayout for the RecyclerView.
         StaggeredGridLayoutManager gridLayoutManager =
                 new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
         rvResults.setLayoutManager(gridLayoutManager);
-        // Retain an instance so that you can call 'resetState()' for fresh searches.
+
+        // Create and set an endless scroll listener for the RecyclerView.
         mScrollListener = new EndlessRecyclerViewScrollListener(gridLayoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
@@ -98,20 +98,13 @@ public class SearchActivity extends AppCompatActivity {
                 loadNextDataFromApi(page);
             }
         };
-        // Adds the scroll listener to RecyclerView.
         rvResults.addOnScrollListener(mScrollListener);
 
-        // Add dividers to the grid.
+        // Add dividers to the staggered grid.
         SpacesItemDecoration decoration = new SpacesItemDecoration(20);
         rvResults.addItemDecoration(decoration);
-    }
 
-    /*
-     * Set the on item click listener for the |rvResults| RecyclerView. It creates the intent for the
-     * ArticleActivity, passes the article clicked to it and calls the new activity.
-     */
-    private void setupOnItemClickListener() {
-        // Hook up the listener for recyclerview item click.
+        // Add onItemClickListener to the recyclerView.
         ItemClickSupport.addTo(rvResults).setOnItemClickListener(
                 new ItemClickSupport.OnItemClickListener() {
                     @Override
@@ -191,37 +184,12 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     /*
-     * Append the next page of data into the adapter.
-     * This method sends out a network request and appends new data items to your adapter.
-     */
-    public void loadNextDataFromApi(int offset) {
-        // Send an API request to retrieve appropriate paginated data
-        //  --> Send the request including an offset value (i.e `page`) as a query parameter.
-        String query = etQuery.getText().toString();
-        ArticleClient articleClient = new ArticleClient();
-        articleClient.getArticlesNextPage(query, offset, mFilter, new JsonHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                onApiCallSuccess(statusCode, headers, response);
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                Log.d("ERROR", "status: " + statusCode + " response: " + responseString);
-            }
-            //  --> Deserialize and construct new model objects from the API response
-            //  --> Append the new data objects to the existing set of items inside the array of items
-            //  --> Notify the adapter of the new items made with `notifyDataSetChanged()`
-        });
-    }
-
-    /*
      * Fetch the articles from the API using the query |query| and the current filters |mFilter|,
      * and set the results into the collection, notifying the adapter.
      */
     private void fetchArticles(String query) {
-        // Create an article client.
-        ArticleClient articleClient = new ArticleClient();
+        // Create an article client with the given NYT API KEY.
+        ArticleClient articleClient = new ArticleClient(getString(R.string.nyt_article_search_api_key));
         articleClient.getArticles(query, mFilter, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
@@ -231,6 +199,26 @@ public class SearchActivity extends AppCompatActivity {
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                 Toast.makeText(SearchActivity.this, "Error in the API call", Toast.LENGTH_LONG).show();
+                Log.d("ERROR", "status: " + statusCode + " response: " + responseString);
+            }
+        });
+    }
+
+    /*
+     * Append the next page of data into the adapter.
+     * This method sends out a network request and appends new data items to your adapter.
+     */
+    public void loadNextDataFromApi(int offset) {
+        String query = etQuery.getText().toString();
+        ArticleClient articleClient = new ArticleClient(getString(R.string.nyt_article_search_api_key));
+        articleClient.getArticlesNextPage(query, offset, mFilter, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                onApiCallSuccess(statusCode, headers, response);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                 Log.d("ERROR", "status: " + statusCode + " response: " + responseString);
             }
         });

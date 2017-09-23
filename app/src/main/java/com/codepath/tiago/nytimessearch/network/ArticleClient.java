@@ -14,13 +14,14 @@ import java.net.URLEncoder;
 
 public class ArticleClient {
 
-    private final String NYT_API_KEY = "8337eda794df48cbb6ae2fd466c77561";
     private final String NYT_API_BASE_URL = "http://api.nytimes.com/svc/search/v2/";
-
     private final String relative_url = "articlesearch.json";
+
+    private final String NYT_API_KEY;
     AsyncHttpClient client;
 
-    public ArticleClient() {
+    public ArticleClient(String apiKey) {
+        this.NYT_API_KEY = apiKey;
         this.client = new AsyncHttpClient();
     }
 
