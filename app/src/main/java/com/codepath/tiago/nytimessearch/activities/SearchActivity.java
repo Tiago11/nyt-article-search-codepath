@@ -12,13 +12,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.codepath.tiago.nytimessearch.R;
 import com.codepath.tiago.nytimessearch.adapters.ArticlesAdapter;
 import com.codepath.tiago.nytimessearch.models.Article;
 import com.codepath.tiago.nytimessearch.models.Filter;
 import com.codepath.tiago.nytimessearch.network.ArticleClient;
+import com.codepath.tiago.nytimessearch.network.ConnectivityChecker;
 import com.codepath.tiago.nytimessearch.utils.EndlessRecyclerViewScrollListener;
 import com.codepath.tiago.nytimessearch.utils.ItemClickSupport;
 import com.codepath.tiago.nytimessearch.utils.SpacesItemDecoration;
@@ -61,6 +61,11 @@ public class SearchActivity extends AppCompatActivity {
         // Get the toolbar.
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        // Check the connectivity.
+        // Displays an alert dialog if there is no connection to inform the user.
+        ConnectivityChecker connectivityChecker = new ConnectivityChecker(SearchActivity.this);
+        connectivityChecker.checkConnectivity();
 
         // Find references to the views in the layout.
         setupViews();
@@ -201,8 +206,7 @@ public class SearchActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                Toast.makeText(SearchActivity.this, "Error in the API call", Toast.LENGTH_LONG).show();
-                Log.d("ERROR", "status: " + statusCode + " response: " + responseString);
+                onApiCallFailure(statusCode, headers, responseString, throwable);
             }
         });
     }
@@ -222,7 +226,7 @@ public class SearchActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                Log.d("ERROR", "status: " + statusCode + " response: " + responseString);
+                onApiCallFailure(statusCode, headers, responseString, throwable);
             }
         });
     }
@@ -252,5 +256,17 @@ public class SearchActivity extends AppCompatActivity {
         } catch(JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    private void onApiCallFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+        Log.e(TAG, "status: " + statusCode + " response: " + responseString);
+
+        // Check the connectivity.
+        // Displays an alert dialog if there is no connection to inform the user.
+        ConnectivityChecker connectivityChecker = new ConnectivityChecker(SearchActivity.this);
+        connectivityChecker.checkConnectivity();
+
+        // Print stack trace of throwable.
+        throwable.printStackTrace();
     }
 }
