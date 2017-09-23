@@ -163,6 +163,24 @@ public class SearchActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle state) {
+        // Save filters state.
+        state.putParcelable("filter", Parcels.wrap(mFilter));
+
+        super.onSaveInstanceState(state);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle state) {
+        super.onRestoreInstanceState(state);
+
+        if (state != null) {
+            // Restore filter settings.
+            mFilter = (Filter) Parcels.unwrap(state.getParcelable("filter"));
+        }
+    }
+
     /*
      * Launches the FilterActivity, where the user can set the filter for the search.
      */
