@@ -35,7 +35,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activities.SearchActivity" />
         </activity>
-        <activity android:name=".activities.FilterActivity"></activity>
     </application>
 
 </manifest>

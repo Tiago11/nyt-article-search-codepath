@@ -1,6 +1,7 @@
 package com.codepath.tiago.nytimessearch.activities;
 
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.MenuItemCompat;
@@ -12,6 +13,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import com.codepath.tiago.nytimessearch.R;
 import com.codepath.tiago.nytimessearch.adapters.ArticlesAdapter;
@@ -52,8 +54,6 @@ public class SearchActivity extends AppCompatActivity implements FilterDialogFra
     // Reference to the scroll listener.
     private EndlessRecyclerViewScrollListener mScrollListener;
 
-    private final int REQUEST_CODE_FILTER_ACTIVITY = 20;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,6 +62,9 @@ public class SearchActivity extends AppCompatActivity implements FilterDialogFra
         // Get the toolbar.
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        // Set up the toolbar's title.
+        setupToolbarTitle(toolbar);
 
         // Check the connectivity.
         // Displays an alert dialog if there is no connection to inform the user.
@@ -73,6 +76,13 @@ public class SearchActivity extends AppCompatActivity implements FilterDialogFra
 
         // Set the ArticlesAdapter and the RecyclerView.
         setupAdapterAndRecyclerView();
+    }
+
+    private void setupToolbarTitle(Toolbar toolbar) {
+        TextView toolbarTitle = (TextView) toolbar.getChildAt(0);
+        Typeface tf = Typeface.createFromAsset(getAssets(), "fonts/Birds-of-Paradise.ttf");
+        toolbarTitle.setTypeface(tf);
+        toolbarTitle.setTextSize(30);
     }
 
     /*
@@ -160,14 +170,6 @@ public class SearchActivity extends AppCompatActivity implements FilterDialogFra
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == RESULT_OK && requestCode == REQUEST_CODE_FILTER_ACTIVITY) {
-            // Set the filter.
-            mFilter = (Filter) Parcels.unwrap(data.getParcelableExtra("filter"));
-        }
-    }
-
-    @Override
     protected void onSaveInstanceState(Bundle state) {
         // Save filters state.
         state.putParcelable("filter", Parcels.wrap(mFilter));
@@ -188,15 +190,6 @@ public class SearchActivity extends AppCompatActivity implements FilterDialogFra
     @Override
     public void onFinishFilterDialog(Filter filter) {
         mFilter = filter;
-    }
-
-    /*
-     * Launches the FilterActivity, where the user can set the filter for the search.
-     */
-    private void showFilters() {
-        Intent i = new Intent(SearchActivity.this, FilterActivity.class);
-        i.putExtra("filter", Parcels.wrap(mFilter));
-        startActivityForResult(i, REQUEST_CODE_FILTER_ACTIVITY);
     }
 
     /*

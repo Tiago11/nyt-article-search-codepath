@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">NYTimesSearch</string>
+    <string name="app_name">NY Times Explorer</string>
     <string name="action_filter">Filter</string>
     <string name="hint">Enter search query</string>
     <string name="search">Search</string>
@@ -10,4 +10,5 @@
     <string name="sort_order">Sort order</string>
     <string name="begin_date">Begin date</string>
     <string name="save">Save</string>
+    <string name="reset">Reset Filters</string>
 </resources>
