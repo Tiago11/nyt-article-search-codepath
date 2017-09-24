@@ -43,6 +43,7 @@ public class SearchActivity extends AppCompatActivity implements FilterDialogFra
     private final String TAG = SearchActivity.class.toString();
 
     // Views.
+    TextView tvWelcome;
     RecyclerView rvResults;
     SearchView svQuery;
 
@@ -89,7 +90,9 @@ public class SearchActivity extends AppCompatActivity implements FilterDialogFra
      * Get the references for the different views in the layout.
      */
     private void setupViews() {
+        tvWelcome = (TextView) findViewById(R.id.tvWelcome);
         rvResults = (RecyclerView) findViewById(R.id.rvResults);
+        rvResults.setVisibility(View.GONE);
         mFilter = null;
     }
 
@@ -159,8 +162,7 @@ public class SearchActivity extends AppCompatActivity implements FilterDialogFra
 
         switch (item.getItemId()) {
             case R.id.action_filter:
-                // Start the filterActivity.
-                //showFilters();
+                // Start the filter DialogFragment.
                 showFilterDialog();
                 return true;
             default:
@@ -201,6 +203,10 @@ public class SearchActivity extends AppCompatActivity implements FilterDialogFra
         svQuery.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
+
+                // Hide the welcome message and show the RecyclerView.
+                rvResults.setVisibility(View.VISIBLE);
+                tvWelcome.setVisibility(View.GONE);
 
                 // Clear the results of the previous search.
                 mArticles.clear();
