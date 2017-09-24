@@ -35,7 +35,7 @@ import java.util.List;
 
 import cz.msebera.android.httpclient.Header;
 
-public class SearchActivity extends AppCompatActivity {
+public class SearchActivity extends AppCompatActivity implements FilterDialogFragment.FilterDialogListener {
 
     // Tag for logging.
     private final String TAG = SearchActivity.class.toString();
@@ -185,6 +185,11 @@ public class SearchActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onFinishFilterDialog(Filter filter) {
+        mFilter = filter;
+    }
+
     /*
      * Launches the FilterActivity, where the user can set the filter for the search.
      */
@@ -297,7 +302,7 @@ public class SearchActivity extends AppCompatActivity {
 
     private void showFilterDialog() {
         FragmentManager fm = getSupportFragmentManager();
-        FilterDialogFragment filterDialogFragment = FilterDialogFragment.newInstance();
+        FilterDialogFragment filterDialogFragment = FilterDialogFragment.newInstance(mFilter);
         filterDialogFragment.show(fm, "fragment_filters");
     }
 }
