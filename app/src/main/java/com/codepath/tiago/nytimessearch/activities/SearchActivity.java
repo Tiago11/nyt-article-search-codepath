@@ -2,6 +2,7 @@ package com.codepath.tiago.nytimessearch.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
@@ -14,6 +15,7 @@ import android.view.View;
 
 import com.codepath.tiago.nytimessearch.R;
 import com.codepath.tiago.nytimessearch.adapters.ArticlesAdapter;
+import com.codepath.tiago.nytimessearch.fragments.FilterDialogFragment;
 import com.codepath.tiago.nytimessearch.models.Article;
 import com.codepath.tiago.nytimessearch.models.Filter;
 import com.codepath.tiago.nytimessearch.network.ApiCallHandlers;
@@ -148,7 +150,8 @@ public class SearchActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.action_filter:
                 // Start the filterActivity.
-                showFilters();
+                //showFilters();
+                showFilterDialog();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -194,6 +197,7 @@ public class SearchActivity extends AppCompatActivity {
     /*
      *  Sets up the search view and its listeners.
      */
+    @SuppressWarnings("deprecation")
     private void setupSearchItem(MenuItem searchItem) {
         svQuery = (SearchView) MenuItemCompat.getActionView(searchItem);
         svQuery.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -289,5 +293,11 @@ public class SearchActivity extends AppCompatActivity {
                 handlers.onApiCallFailure();
             }
         });
+    }
+
+    private void showFilterDialog() {
+        FragmentManager fm = getSupportFragmentManager();
+        FilterDialogFragment filterDialogFragment = FilterDialogFragment.newInstance();
+        filterDialogFragment.show(fm, "fragment_filters");
     }
 }
