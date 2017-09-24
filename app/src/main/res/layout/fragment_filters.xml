@@ -9,7 +9,9 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"
-        android:text="@string/begin_date" />
+        android:text="@string/begin_date"
+        android:textColor="@color/colorAccent"
+        android:textStyle="bold"/>
 
     <EditText
         android:id="@+id/etDate"
@@ -27,7 +29,9 @@
         android:layout_below="@+id/etDate"
         android:layout_marginTop="30dp"
         android:layout_centerHorizontal="true"
-        android:text="@string/sort_order" />
+        android:text="@string/sort_order"
+        android:textColor="@color/colorAccent"
+        android:textStyle="bold" />
 
     <Spinner
         android:id="@+id/sSort"
@@ -48,7 +52,9 @@
         android:layout_below="@+id/sSort"
         android:layout_marginTop="30dp"
         android:layout_centerHorizontal="true"
-        android:text="@string/news_desk_values" />
+        android:text="@string/news_desk_values"
+        android:textColor="@color/colorAccent"
+        android:textStyle="bold" />
 
     <LinearLayout
         android:id="@+id/llCheckboxes"

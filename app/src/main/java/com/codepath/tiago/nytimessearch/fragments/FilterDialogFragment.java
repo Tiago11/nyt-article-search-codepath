@@ -136,6 +136,7 @@ public class FilterDialogFragment extends DialogFragment implements DatePickerDi
         });
         btnSave.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
         btnSave.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
+
     }
 
     public void saveFilter(View view) {
