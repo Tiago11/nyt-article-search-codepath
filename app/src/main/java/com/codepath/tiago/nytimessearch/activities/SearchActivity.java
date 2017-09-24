@@ -2,15 +2,15 @@ package com.codepath.tiago.nytimessearch.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 
 import com.codepath.tiago.nytimessearch.R;
 import com.codepath.tiago.nytimessearch.adapters.ArticlesAdapter;
@@ -39,9 +39,8 @@ public class SearchActivity extends AppCompatActivity {
     private final String TAG = SearchActivity.class.toString();
 
     // Views.
-    EditText etQuery;
     RecyclerView rvResults;
-    Button btnSearch;
+    SearchView svQuery;
 
     // Models and adapter.
     List<Article> mArticles;
@@ -78,9 +77,7 @@ public class SearchActivity extends AppCompatActivity {
      * Get the references for the different views in the layout.
      */
     private void setupViews() {
-        etQuery = (EditText) findViewById(R.id.etQuery);
         rvResults = (RecyclerView) findViewById(R.id.rvResults);
-        btnSearch = (Button) findViewById(R.id.btnSearch);
         mFilter = null;
     }
 
@@ -135,7 +132,11 @@ public class SearchActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_search, menu);
-        return true;
+
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        setupSearchItem(searchItem);
+
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -191,22 +192,35 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     /*
-     * Event fired when the user provides a query for the search.
-     * Makes the API call with that query and the filters (if any), and populates the row views.
+     *  Sets up the search view and its listeners.
      */
-    public void onArticleSearch(View view) {
+    private void setupSearchItem(MenuItem searchItem) {
+        svQuery = (SearchView) MenuItemCompat.getActionView(searchItem);
+        svQuery.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
 
-        // Get the query made by the user.
-        String query = etQuery.getText().toString();
+                // Clear the results of the previous search.
+                mArticles.clear();
+                mAdapter.notifyDataSetChanged();
+                // Reset endless scroll listener because we are performing a new search.
+                mScrollListener.resetState();
 
-        // Clear the results of the previous search.
-        mArticles.clear();
-        mAdapter.notifyDataSetChanged();
-        // Reset endless scroll listener because we are performing a new search.
-        mScrollListener.resetState();
+                // Make the API call to get the articles for this query..
+                fetchArticles(query);
 
-        // Make the API call to get the articles for this query..
-        fetchArticles(query);
+                // workaround to avoid issues with some emulators and keyboard devices firing twice if a keyboard enter is used
+                // see https://code.google.com/p/android/issues/detail?id=24599
+                svQuery.clearFocus();
+
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
     }
 
     /*
@@ -247,7 +261,9 @@ public class SearchActivity extends AppCompatActivity {
      * This method sends out a network request and appends new data items to your adapter.
      */
     public void loadNextDataFromApi(int offset) {
-        String query = etQuery.getText().toString();
+        // Get the query from the search bar.
+        String query = svQuery.getQuery().toString();
+        // Create a client with the NYT API KEY and get the next page of articles.
         ArticleClient articleClient = new ArticleClient(getString(R.string.nyt_article_search_api_key));
         articleClient.getArticlesNextPage(query, offset, mFilter, new JsonHttpResponseHandler() {
             @Override
