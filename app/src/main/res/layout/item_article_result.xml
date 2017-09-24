@@ -31,10 +31,23 @@
         tools:text="TextView" />
 
     <TextView
-        android:id="@+id/tvSnippet"
+        android:id="@+id/tvByline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/tvTitle"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="2dp"
+        android:textStyle="bold"
+        android:textSize="8sp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Caption" />
+
+    <TextView
+        android:id="@+id/tvSnippet"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvByline"
         android:ellipsize="end"
         android:maxLines="5"
         android:layout_marginLeft="5dp"

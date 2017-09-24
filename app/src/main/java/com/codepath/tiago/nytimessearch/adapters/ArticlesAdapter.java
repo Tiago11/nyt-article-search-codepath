@@ -77,6 +77,7 @@ public class ArticlesAdapter extends RecyclerView.Adapter<ArticlesAdapter.ViewHo
         // Your holder should contain a member variable
         // for any view that will be set as you render a row.
         public TextView tvTitle;
+        public TextView tvByline;
         public TextView tvSnippet;
         public DynamicHeightImageView ivImage;
         public SimpleTarget mThumbnailTarget;
@@ -89,6 +90,7 @@ public class ArticlesAdapter extends RecyclerView.Adapter<ArticlesAdapter.ViewHo
             super(itemView);
 
             tvTitle = (TextView) itemView.findViewById(R.id.tvTitle);
+            tvByline = (TextView) itemView.findViewById(R.id.tvByline);
             tvSnippet = (TextView) itemView.findViewById(R.id.tvSnippet);
             ivImage = (DynamicHeightImageView) itemView.findViewById(R.id.ivImage);
 
@@ -113,7 +115,12 @@ public class ArticlesAdapter extends RecyclerView.Adapter<ArticlesAdapter.ViewHo
 
             // Set item views based on your views and data model.
             this.tvTitle.setText(article.getHeadline());
-            this.tvSnippet.setText(article.getmSnippet());
+            if (article.hasByline()) {
+                this.tvByline.setText(article.getByline());
+            } else {
+                this.tvByline.setVisibility(View.INVISIBLE);
+            }
+            this.tvSnippet.setText(article.getSnippet());
             // Populate the image thumbnail.
             String thumbnail = article.getThumbnail();
 

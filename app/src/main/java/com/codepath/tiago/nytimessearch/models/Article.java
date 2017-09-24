@@ -22,6 +22,7 @@ public class Article {
 
     String mWebUrl;
     String mHeadline;
+    String mByline;
     String mSnippet;
     String mThumbnail;
 
@@ -33,7 +34,9 @@ public class Article {
         return mHeadline;
     }
 
-    public String getmSnippet() { return mSnippet; }
+    public String getByline() { return mByline; }
+
+    public String getSnippet() { return mSnippet; }
 
     public String getThumbnail() {
         if (TextUtils.isEmpty(mThumbnail)) {
@@ -54,6 +57,11 @@ public class Article {
 
             this.mWebUrl = jsonObject.getString("web_url");
             this.mHeadline = jsonObject.getJSONObject("headline").getString("main");
+            if (jsonObject.has("byline")) {
+                this.mByline = jsonObject.getJSONObject("byline").getString("original");
+            } else {
+                this.mByline = null;
+            }
             this.mSnippet = jsonObject.getString("snippet");
 
             JSONArray multimedia = jsonObject.getJSONArray("multimedia");
@@ -85,5 +93,10 @@ public class Article {
         }
 
         return results;
+    }
+
+    // Predicates.
+    public boolean hasByline() {
+        return (this.mByline != null);
     }
 }
