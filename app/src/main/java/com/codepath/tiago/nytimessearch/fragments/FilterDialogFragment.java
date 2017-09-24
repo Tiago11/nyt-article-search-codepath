@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -62,8 +63,8 @@ public class FilterDialogFragment extends DialogFragment implements DatePickerDi
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                 Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_filters, container);
-
+        //return inflater.inflate(R.layout.fragment_filters, container);
+        return getActivity().getLayoutInflater().inflate(R.layout.fragment_filters, container);
     }
 
     @Override
@@ -89,7 +90,7 @@ public class FilterDialogFragment extends DialogFragment implements DatePickerDi
         FragmentManager fm = getFragmentManager();
         DatePickerDialogFragment frag = new DatePickerDialogFragment();
         frag.setTargetFragment(FilterDialogFragment.this, 300);
-        frag.show(fm, "datepicker");
+        frag.show(fm, "DatePickerDialogTheme");
     }
 
     @Override
@@ -112,7 +113,7 @@ public class FilterDialogFragment extends DialogFragment implements DatePickerDi
 
         dismiss();
     }
-    
+
     private void setupViews(View view) {
         etDate = (EditText) view.findViewById(R.id.etDate);
         etDate.setOnClickListener(new View.OnClickListener() {
@@ -133,7 +134,8 @@ public class FilterDialogFragment extends DialogFragment implements DatePickerDi
                 saveFilter(view);
             }
         });
-
+        btnSave.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
+        btnSave.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
     }
 
     private Filter getFilterFromViews() {

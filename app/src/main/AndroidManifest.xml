@@ -25,16 +25,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <!-- A child of the main activity -->
-        <activity
-            android:name=".activities.ArticleActivity"
-            android:parentActivityName=".activities.SearchActivity">
-
-            <!-- Parent activity meta-data to support 4.0 and lower -->
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activities.SearchActivity" />
-        </activity>
         <activity android:name=".activities.FilterActivity"></activity>
     </application>
 
