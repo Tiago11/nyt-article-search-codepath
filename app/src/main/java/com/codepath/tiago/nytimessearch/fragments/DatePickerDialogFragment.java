@@ -30,9 +30,9 @@ public class DatePickerDialogFragment extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         Dialog dialog = super.onCreateDialog(savedInstanceState);
 
-        // Use the current date as the default value for the picker.
+        // Use last year as the default date value for the picker.
         final Calendar c = Calendar.getInstance();
-        int year = c.get(Calendar.YEAR);
+        int year = c.get(Calendar.YEAR) - 1;
         int month = c.get(Calendar.MONTH);
         int day = c.get(Calendar.DAY_OF_MONTH);
 
@@ -41,8 +41,14 @@ public class DatePickerDialogFragment extends DialogFragment {
 
         // Create a new instance of DatePickerDialog.
         DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(), 0, listener, year, month, day);
+        // Set today's date as maximum date for the picker.
+        datePickerDialog.getDatePicker().setMaxDate(c.getTime().getTime());
+        // Set 1852 as minimum date for the picker (The API has articles starting from 1852).
+        c.set(1852,1,1);
+        datePickerDialog.getDatePicker().setMinDate(c.getTime().getTime());
         // Remove the title in the DatePickerDialog.
         datePickerDialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+        // Change the color to match the app style.
         colorizeDatePickerDialog(datePickerDialog);
 
         return datePickerDialog;

@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">NY Times Explorer</string>
+    <string name="app_title">NY Times Explorer</string>
     <string name="action_filter">Filter</string>
     <string name="hint">Enter search query</string>
     <string name="search">Search</string>

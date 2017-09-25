@@ -2,7 +2,7 @@
 
 **NYTimes article search** is an android app that allows a user to search for articles on web using simple filters. The app utilizes [New York Times Search API](http://developer.nytimes.com/docs/read/article_search_api_v2).
 
-Time spent: **X** hours spent in total
+Time spent: **14** hours spent in total
 
 ## User Stories
 
@@ -40,15 +40,16 @@ The following **bonus** features are implemented:
 
 The following **additional** features are implemented:
 
-* [ ] List anything else that you can get done to improve the app functionality!
+* [X] Show a Reset Filters button in the overlay modal that clears any filter.
+* [X] Add launcher icon for the app.
 
 ## Video Walkthrough
 
 Here's a walkthrough of implemented user stories:
 
-<img src='http://i.imgur.com/link/to/your/gif/file.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+![](http://i.imgur.com/WhsZUL8.gif)
 
-GIF created with [LiceCap](http://www.cockos.com/licecap/).
+[Link to video on Imgur](https://imgur.com/WhsZUL8)
 
 ## Notes
 
@@ -58,10 +59,12 @@ Describe any challenges encountered while building the app.
 
 - [Android Async HTTP](https://github.com/loopj/android-async-http) - Simple asynchronous HTTP requests with JSON parsing
 - [Picasso](http://square.github.io/picasso/) - Image loading and caching library for Android
+- [Parceler](http://parceler.org/) - Code generation library that generates the Android Parcelable boilerplate source code
+- [Glide](http://bumptech.github.io/glide/) - Fast and efficient image loading library for Android focused on smooth scrolling
 
 ## License
 
-    Copyright [yyyy] [name of copyright owner]
+    Copyright [2017] [Santiago Paez]
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.

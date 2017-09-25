@@ -19,6 +19,7 @@ import android.widget.Spinner;
 
 import com.codepath.tiago.nytimessearch.R;
 import com.codepath.tiago.nytimessearch.models.Filter;
+import com.codepath.tiago.nytimessearch.utils.DateFormatter;
 
 import org.parceler.Parcels;
 
@@ -103,7 +104,7 @@ public class FilterDialogFragment extends DialogFragment implements DatePickerDi
         c.set(Calendar.DAY_OF_MONTH, dayOfMonth);
 
         mDate = c.getTime();
-        etDate.setText(c.getTime().toString());
+        etDate.setText(DateFormatter.FormatDateToString(c.getTime()));
     }
 
     private void setupViews(View view) {
@@ -191,7 +192,8 @@ public class FilterDialogFragment extends DialogFragment implements DatePickerDi
 
     private void setFilterInfoIntoViews(Filter filter) {
         if (filter != null) {
-            etDate.setText(filter.getBeginDateString());
+            etDate.setText(DateFormatter.FormatDateToString(filter.getBeginDate()));
+            mDate = filter.getBeginDate();
 
             // Set spinner.
             if (filter.getSortOrder() == Filter.SortValues.OLDEST) {

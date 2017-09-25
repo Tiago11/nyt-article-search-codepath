@@ -83,6 +83,7 @@ public class SearchActivity extends AppCompatActivity implements FilterDialogFra
         TextView toolbarTitle = (TextView) toolbar.getChildAt(0);
         Typeface tf = Typeface.createFromAsset(getAssets(), "fonts/Birds-of-Paradise.ttf");
         toolbarTitle.setTypeface(tf);
+        toolbarTitle.setText(R.string.app_title);
         toolbarTitle.setTextSize(30);
     }
 
@@ -251,14 +252,13 @@ public class SearchActivity extends AppCompatActivity implements FilterDialogFra
             }
 
             @Override
-            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 ApiCallHandlers handlers = ApiCallHandlersBuilder.apiCallHandlers()
-                                                .withStatusCode(statusCode)
-                                                .withResponseString(responseString)
-                                                .withThrowable(throwable)
-                                                .withContext(SearchActivity.this)
-                                                .build();
+                        .withStatusCode(statusCode)
+                        .withResponse(errorResponse)
+                        .withThrowable(throwable)
+                        .withContext(SearchActivity.this)
+                        .build();
                 handlers.onApiCallFailure();
             }
         });
@@ -286,11 +286,10 @@ public class SearchActivity extends AppCompatActivity implements FilterDialogFra
             }
 
             @Override
-            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 ApiCallHandlers handlers = ApiCallHandlersBuilder.apiCallHandlers()
                         .withStatusCode(statusCode)
-                        .withResponseString(responseString)
+                        .withResponse(errorResponse)
                         .withThrowable(throwable)
                         .withContext(SearchActivity.this)
                         .build();

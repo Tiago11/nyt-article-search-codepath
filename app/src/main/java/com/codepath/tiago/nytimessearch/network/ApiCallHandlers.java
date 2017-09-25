@@ -68,7 +68,11 @@ public class ApiCallHandlers {
     }
 
     public void onApiCallFailure() {
-        Log.e(TAG, "status: " + mStatusCode + " response: " + mResponseString);
+        if (mResponseString != null) {
+            Log.e(TAG, "status: " + mStatusCode + " response: " + mResponseString);
+        } else {
+            Log.e(TAG, "status: " + mStatusCode + " JSONresponse: " + mResponse.toString());
+        }
 
         // Check the connectivity.
         // Displays an alert dialog if there is no connection to inform the user.
