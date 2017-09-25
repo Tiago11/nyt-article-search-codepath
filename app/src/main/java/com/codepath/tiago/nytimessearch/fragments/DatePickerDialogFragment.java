@@ -54,6 +54,9 @@ public class DatePickerDialogFragment extends DialogFragment {
         return datePickerDialog;
     }
 
+    /*
+     * Auxiliary function to change the color of the DatePickerDialog's datePicker.
+     */
     public static void colorizeDatePickerDialog(DatePickerDialog datePickerDialog) {
         DatePicker mDatePickerInstance = null;
         try {
@@ -82,6 +85,9 @@ public class DatePickerDialogFragment extends DialogFragment {
         }
     }
 
+    /*
+     * Auxiliary function to change a NumberPicker dividers color.
+     */
     private static void setDividerColor(NumberPicker picker) {
         if (picker == null)
             return;

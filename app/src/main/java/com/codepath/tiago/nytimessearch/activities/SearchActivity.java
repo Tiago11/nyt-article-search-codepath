@@ -55,6 +55,8 @@ public class SearchActivity extends AppCompatActivity implements FilterDialogFra
     // Reference to the scroll listener.
     private EndlessRecyclerViewScrollListener mScrollListener;
 
+    /* Activity methods */
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,6 +81,93 @@ public class SearchActivity extends AppCompatActivity implements FilterDialogFra
         setupAdapterAndRecyclerView();
     }
 
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_search, menu);
+
+        // Find a reference to the search item and set its listeners.
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        setupSearchItem(searchItem);
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+
+        switch (item.getItemId()) {
+            case R.id.action_filter:
+                // Start the filter DialogFragment.
+                showFilterDialog();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+
+    }
+
+
+    @Override
+    protected void onSaveInstanceState(Bundle state) {
+        // Save filters state.
+        state.putParcelable("filter", Parcels.wrap(mFilter));
+
+        super.onSaveInstanceState(state);
+    }
+
+
+    @Override
+    protected void onRestoreInstanceState(Bundle state) {
+        super.onRestoreInstanceState(state);
+
+        if (state != null) {
+            // Restore filter settings.
+            mFilter = (Filter) Parcels.unwrap(state.getParcelable("filter"));
+        }
+    }
+
+    /* FilterDialogFragment methods */
+
+    @Override
+    public void onFinishFilterDialog(Filter filter) {
+        mFilter = filter;
+    }
+
+
+    /*
+     * Launches the dialogFragment where the user can set the filters.
+     */
+    private void showFilterDialog() {
+        FragmentManager fm = getSupportFragmentManager();
+        FilterDialogFragment filterDialogFragment = FilterDialogFragment.newInstance(mFilter);
+        filterDialogFragment.show(fm, "fragment_filters");
+    }
+
+
+    /* Setup methods */
+
+
+    /*
+     * Get the references for the different views in the layout.
+     */
+    private void setupViews() {
+        tvWelcome = (TextView) findViewById(R.id.tvWelcome);
+        rvResults = (RecyclerView) findViewById(R.id.rvResults);
+        // Hide the recycler view to show the welcome message.
+        rvResults.setVisibility(View.GONE);
+        mFilter = null;
+    }
+
+
+    /*
+     * Applies custom styling to the toolbar (font, size, text);
+     */
     private void setupToolbarTitle(Toolbar toolbar) {
         TextView toolbarTitle = (TextView) toolbar.getChildAt(0);
         Typeface tf = Typeface.createFromAsset(getAssets(), "fonts/Birds-of-Paradise.ttf");
@@ -87,15 +176,6 @@ public class SearchActivity extends AppCompatActivity implements FilterDialogFra
         toolbarTitle.setTextSize(30);
     }
 
-    /*
-     * Get the references for the different views in the layout.
-     */
-    private void setupViews() {
-        tvWelcome = (TextView) findViewById(R.id.tvWelcome);
-        rvResults = (RecyclerView) findViewById(R.id.rvResults);
-        rvResults.setVisibility(View.GONE);
-        mFilter = null;
-    }
 
     /*
      * Initialize and set listeners for the ArticlesAdapter and for the RecyclerView.
@@ -144,56 +224,6 @@ public class SearchActivity extends AppCompatActivity implements FilterDialogFra
         );
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_search, menu);
-
-        MenuItem searchItem = menu.findItem(R.id.action_search);
-        setupSearchItem(searchItem);
-
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-
-        switch (item.getItemId()) {
-            case R.id.action_filter:
-                // Start the filter DialogFragment.
-                showFilterDialog();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle state) {
-        // Save filters state.
-        state.putParcelable("filter", Parcels.wrap(mFilter));
-
-        super.onSaveInstanceState(state);
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle state) {
-        super.onRestoreInstanceState(state);
-
-        if (state != null) {
-            // Restore filter settings.
-            mFilter = (Filter) Parcels.unwrap(state.getParcelable("filter"));
-        }
-    }
-
-    @Override
-    public void onFinishFilterDialog(Filter filter) {
-        mFilter = filter;
-    }
 
     /*
      *  Sets up the search view and its listeners.
@@ -215,7 +245,7 @@ public class SearchActivity extends AppCompatActivity implements FilterDialogFra
                 // Reset endless scroll listener because we are performing a new search.
                 mScrollListener.resetState();
 
-                // Make the API call to get the articles for this query..
+                // Make the API call to get the articles for this query.
                 fetchArticles(query);
 
                 // workaround to avoid issues with some emulators and keyboard devices firing twice if a keyboard enter is used
@@ -232,6 +262,9 @@ public class SearchActivity extends AppCompatActivity implements FilterDialogFra
         });
     }
 
+    /* API fetch methods */
+
+
     /*
      * Fetch the articles from the API using the query |query| and the current filters |mFilter|,
      * and set the results into the collection, notifying the adapter.
@@ -242,7 +275,7 @@ public class SearchActivity extends AppCompatActivity implements FilterDialogFra
         articleClient.getArticles(query, mFilter, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-
+                // Parses the response, adds items to collection and notifies adapter.
                 ApiCallHandlers handlers = ApiCallHandlersBuilder.apiCallHandlers()
                                                 .withResponse(response)
                                                 .withAdapter(mAdapter)
@@ -253,6 +286,7 @@ public class SearchActivity extends AppCompatActivity implements FilterDialogFra
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                // Handles failure.
                 ApiCallHandlers handlers = ApiCallHandlersBuilder.apiCallHandlers()
                         .withStatusCode(statusCode)
                         .withResponse(errorResponse)
@@ -263,6 +297,7 @@ public class SearchActivity extends AppCompatActivity implements FilterDialogFra
             }
         });
     }
+
 
     /*
      * Append the next page of data into the adapter.
@@ -276,7 +311,7 @@ public class SearchActivity extends AppCompatActivity implements FilterDialogFra
         articleClient.getArticlesNextPage(query, offset, mFilter, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-
+                // Parses the response, adds items to collection and notifies adapter.
                 ApiCallHandlers handlers = ApiCallHandlersBuilder.apiCallHandlers()
                         .withResponse(response)
                         .withAdapter(mAdapter)
@@ -287,6 +322,7 @@ public class SearchActivity extends AppCompatActivity implements FilterDialogFra
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                // Handles the failure.
                 ApiCallHandlers handlers = ApiCallHandlersBuilder.apiCallHandlers()
                         .withStatusCode(statusCode)
                         .withResponse(errorResponse)
@@ -296,11 +332,5 @@ public class SearchActivity extends AppCompatActivity implements FilterDialogFra
                 handlers.onApiCallFailure();
             }
         });
-    }
-
-    private void showFilterDialog() {
-        FragmentManager fm = getSupportFragmentManager();
-        FilterDialogFragment filterDialogFragment = FilterDialogFragment.newInstance(mFilter);
-        filterDialogFragment.show(fm, "fragment_filters");
     }
 }

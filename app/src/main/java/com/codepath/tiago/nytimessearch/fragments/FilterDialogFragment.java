@@ -76,6 +76,7 @@ public class FilterDialogFragment extends DialogFragment implements DatePickerDi
         // Get references to the dialog views and fields.
         setupViews(view);
 
+        // Get the filter settings from the activity and set it into the views.
         Filter filter = (Filter) Parcels.unwrap(getArguments().getParcelable("filter"));
         setFilterInfoIntoViews(filter);
     }
@@ -88,6 +89,9 @@ public class FilterDialogFragment extends DialogFragment implements DatePickerDi
         return dialog;
     }
 
+    /*
+     * Starts the datePickerDialog.
+     */
     public void showDatePickerDialog(View v) {
         FragmentManager fm = getFragmentManager();
         DatePickerDialogFragment frag = new DatePickerDialogFragment();
@@ -95,6 +99,9 @@ public class FilterDialogFragment extends DialogFragment implements DatePickerDi
         frag.show(fm, "DatePickerDialogTheme");
     }
 
+    /*
+     * Get the date from the datePickerDialog and set it into the textField.
+     */
     @Override
     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
         // store the values selected into a Calendar instance.
@@ -107,6 +114,9 @@ public class FilterDialogFragment extends DialogFragment implements DatePickerDi
         etDate.setText(DateFormatter.FormatDateToString(c.getTime()));
     }
 
+    /*
+     * Get references for the views and set listeners.
+     */
     private void setupViews(View view) {
         etDate = (EditText) view.findViewById(R.id.etDate);
         etDate.setOnClickListener(new View.OnClickListener() {
@@ -140,6 +150,9 @@ public class FilterDialogFragment extends DialogFragment implements DatePickerDi
 
     }
 
+    /*
+     * Create the Filter object from the views information and send it back to the activity.
+     */
     public void saveFilter(View view) {
         Filter filter = getFilterFromViews();
 
@@ -149,6 +162,9 @@ public class FilterDialogFragment extends DialogFragment implements DatePickerDi
         dismiss();
     }
 
+    /*
+     * Send an empty (null) filter back to the activity to indicate a reset on the filter settings.
+     */
     public void resetFilter(View view) {
         Filter filter = null;
 
@@ -158,6 +174,9 @@ public class FilterDialogFragment extends DialogFragment implements DatePickerDi
         dismiss();
     }
 
+    /*
+     * Create a Filter object from the views.
+     */
     private Filter getFilterFromViews() {
 
         // Get the sort order.
@@ -190,6 +209,9 @@ public class FilterDialogFragment extends DialogFragment implements DatePickerDi
         return filter;
     }
 
+    /*
+     * Set information into the views according to the information in the filter object.
+     */
     private void setFilterInfoIntoViews(Filter filter) {
         if (filter != null) {
             etDate.setText(DateFormatter.FormatDateToString(filter.getBeginDate()));
